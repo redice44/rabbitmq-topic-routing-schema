@@ -1,31 +1,35 @@
 const Connector = require('./connector');
 
+const EXCHANGE_TYPES = [
+  'topic',
+  'direct',
+  'fanout',
+  'headers'
+];
+
 class ExchangeConnector extends Connector {
-  async _create({ name, type, options }) {
+  constructor(amqp, connectionParts) {
+    super(amqp, connectionParts);
+    this.exchange = null;
+  }
+
+  async createExchange({ name, type, options = {} }, override = false) {
+    if(!EXCHANGE_TYPES.includes(type)) {
+      throw new Error(`Invalid exchange type: ${type}`);
+    }
     try {
       await this.channel.assertExchange(name, type, options);
-      return { name, type, options };
+      this.exchange = { name, type, options };
     } catch (error) {
       // Reconnect the channel, but still bubble error
       await this.connect();
-      throw error;
+      if (override) {
+        await this.channel.deleteExchange(name);
+        await this.createExchange({ name, type, options });
+      } else {
+        throw error;
+      }
     }
-  }
-
-  async createDirect(name, options) {
-    return await this._create({ name, type: 'direct', options });
-  }
-
-  async createFanout(name, options) {
-    return await this._create({ name, type: 'fanout', options });
-  }
-
-  async createHeaders(name, options) {
-    return await this._create({ name, type: 'headers', options });
-  }
-
-  async createTopic(name, options) {
-    return await this._create({ name, type: 'topic', options });
   }
 }
 
