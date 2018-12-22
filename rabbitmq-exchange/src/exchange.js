@@ -18,17 +18,24 @@ class ExchangeConnector extends Connector {
       throw new Error(`Invalid exchange type: ${type}`);
     }
     try {
-      await this.channel.assertExchange(name, type, options);
       this.exchange = { name, type, options };
+      await this.channel.assertExchange(name, type, options);
     } catch (error) {
       // Reconnect the channel, but still bubble error
       await this.connect();
       if (override) {
-        await this.channel.deleteExchange(name);
+        await this.deleteExchange();
         await this.createExchange({ name, type, options });
       } else {
         throw error;
       }
+    }
+  }
+
+  async deleteExchange() {
+    if (this.exchange) {
+      await this.channel.deleteExchange(this.exchange.name);
+      this.exchange = null;
     }
   }
 }
