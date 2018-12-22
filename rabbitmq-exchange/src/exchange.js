@@ -32,10 +32,22 @@ class ExchangeConnector extends Connector {
     }
   }
 
+  async bindQueue(queueName, keys, options = {}) {
+    this.ensureChannel();
+    this.ensureExchange();
+    await this.channel.bindQueue(queueName, this.exchange.name, keys, options);
+  }
+
   async deleteExchange() {
     if (this.exchange) {
       await this.channel.deleteExchange(this.exchange.name);
       this.exchange = null;
+    }
+  }
+
+  ensureExchange() {
+    if (!this.exchange) {
+      throw new Error('This requires an active exchange.');
     }
   }
 }
