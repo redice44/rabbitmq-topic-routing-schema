@@ -1,5 +1,5 @@
 {
-  "name": "rabbitmq-topic-routing-schema",
+  "name": "@redice44/rabbitmq-topic-routing-schema",
   "version": "0.0.1",
   "description": "",
   "main": "src/index.js",
