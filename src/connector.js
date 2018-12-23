@@ -4,6 +4,7 @@ class Connector {
     this.connectionString = `amqp://${user}:${pass}@${url}`;
     this.connection = null;;
     this.channel = null;
+    this.timeoutId = null;
   }
 
   async connect() {
@@ -18,23 +19,23 @@ class Connector {
   }
 
   async connectWithRetry(retries = 20, waitPeriod = 2000) {
-    let numRetries = 0;
-    let timeoutId;
     const waitSeconds = Math.floor(waitPeriod / 1000);
 
     try {
-      await this.connect();
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = null;
       }
+      await this.connect();
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
-        if (numRetries < retries) {
-          numRetries++;
-          console.log(`Trying again in ${waitSeconds} seconds...`);
-          timeoutId = setTimeout(connect, waitPeriod);
+        if (retries > 0) {
+          retries--;
+          console.log(`Retries remaining: ${retries}. Trying again in ${waitSeconds} seconds...`);
+          this.timeoutId = setTimeout(this.connectWithRetry.bind(this), waitPeriod, retries);
         } else {
-          clearTimeout(timeoutId);
+          clearTimeout(this.timeoutId);
+          this.timeoutId = null;
           throw error;
         }
       }
