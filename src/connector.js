@@ -1,6 +1,7 @@
+const amqp = require('amqplib');
+
 class Connector {
-  constructor(amqp, { user, pass, url }) {
-    this.amqp = amqp;
+  constructor({ user, pass, url }) {
     this.connectionString = `amqp://${user}:${pass}@${url}`;
     this.connection = null;;
     this.channel = null;
@@ -9,7 +10,7 @@ class Connector {
 
   async connect() {
     if (!this.connection) {
-      this.connection = await this.amqp.connect(this.connectionString);
+      this.connection = await amqp.connect(this.connectionString);
     }
     if (!this.channel) {
       this.channel = await this.connection.createConfirmChannel();

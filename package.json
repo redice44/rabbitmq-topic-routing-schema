@@ -8,5 +8,8 @@
   },
   "keywords": [],
   "author": "Matt Thomson<mthomson.lee@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^0.5.3"
+  }
 }

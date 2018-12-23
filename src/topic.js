@@ -5,8 +5,8 @@ const DELIM_TOKEN = '.';
 const NULL_TOKEN = '_';
 
 class TopicConnector extends ExchangeConnector {
-  constructor(amqp, connectionParts, name, schema) {
-    super(amqp, connectionParts);
+  constructor(connectionParts, name, schema) {
+    super(connectionParts);
     this.name = name;
     this.schemaKeys = this._buildBaseSchema(schema);
     this.schemaLength = schema.length;

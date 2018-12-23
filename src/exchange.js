@@ -8,8 +8,8 @@ const EXCHANGE_TYPES = [
 ];
 
 class ExchangeConnector extends Connector {
-  constructor(amqp, connectionParts) {
-    super(amqp, connectionParts);
+  constructor(connectionParts) {
+    super(connectionParts);
     this.exchange = null;
   }
 
